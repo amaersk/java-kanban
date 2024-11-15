@@ -5,15 +5,17 @@ import task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class TaskManager {
+public class InMemoryTaskManager implements TaskManager {
 
     protected final HashMap<Integer, Task> taskHashMap = new HashMap<>();
     protected final HashMap<Integer, Epic> epicHashMap = new HashMap<>();
     protected final HashMap<Integer, Subtask> subtaskHashMap = new HashMap<>();
+    public HistoryManager historyManager = Managers.getDefaultHistory();
     private int idCounter;
 
-    public TaskManager() {
+    public InMemoryTaskManager() {
         this.idCounter = 0;
     }
 
@@ -22,6 +24,7 @@ public class TaskManager {
     }
 
     //Создание задачи
+    @Override
     public void addNewTask(Task task) {
         if (task != null) {
             int idTask = idCount();
@@ -31,6 +34,7 @@ public class TaskManager {
     }
 
     //Создание эпиков
+    @Override
     public void addNewEpic(Epic epic) {
         if (epic != null) {
             int idEpic = idCount();
@@ -40,8 +44,11 @@ public class TaskManager {
     }
 
     //Создание подзадач
+    @Override
     public void addNewSubtask(Subtask subtask) {
-        if (subtask != null) {
+        Epic epicCheck = epicHashMap.get(subtask.getIdEpic());
+
+        if (epicCheck != null) {
             int subTaskId = idCount();
             subtask.setId(subTaskId);
             subtaskHashMap.put(subTaskId, subtask);
@@ -83,6 +90,7 @@ public class TaskManager {
 
 
     //Обновление задачи
+    @Override
     public void updateTask(Task task) {
         if (task != null && taskHashMap.containsKey(task.getId())) {
             taskHashMap.put(task.getId(), task);
@@ -90,6 +98,7 @@ public class TaskManager {
     }
 
     //Обновление эпика
+    @Override
     public void updateEpic(Epic epic) {
         if (epic != null && epicHashMap.containsKey(epic.getId())) {
             epicHashMap.put(epic.getId(), epic);
@@ -97,6 +106,7 @@ public class TaskManager {
     }
 
     //Обновление подзадачи
+    @Override
     public void updateSubtask(Subtask subtask) {
         if (subtask != null && subtaskHashMap.containsKey(subtask.getId())) {
             subtaskHashMap.put(subtask.getId(), subtask);
@@ -106,22 +116,29 @@ public class TaskManager {
 
 
     //Получение задачи по id
+    @Override
     public Task getTaskById(int id) {
+        historyManager.add(taskHashMap.get(id));
         return taskHashMap.get(id);
     }
 
     //Получение эпик по id
+    @Override
     public Epic getEpicById(int id) {
+        historyManager.add(epicHashMap.get(id));
         return epicHashMap.get(id);
     }
 
     //Получение подзадачи по id
+    @Override
     public Subtask getSubtaskById(int id) {
+        historyManager.add(subtaskHashMap.get(id));
         return subtaskHashMap.get(id);
     }
 
 
     //Печать задач
+    @Override
     public ArrayList<Task> printAllTasks() {
         if (taskHashMap.isEmpty()) {
             System.out.println("Задачи отсутствуют!");
@@ -130,6 +147,7 @@ public class TaskManager {
     }
 
     //Печать эпиков
+    @Override
     public ArrayList<Epic> printAllEpics() {
         if (epicHashMap.isEmpty()) {
             System.out.println("Эпики отсутствуют!");
@@ -138,6 +156,7 @@ public class TaskManager {
     }
 
     //Печать подзадач
+    @Override
     public ArrayList<Subtask> printAllSubtask() {
         if (subtaskHashMap.isEmpty()) {
             System.out.println("Подзадачи отсутствуют!");
@@ -146,6 +165,7 @@ public class TaskManager {
     }
 
     //Получение списка всех подзадач определённого эпика по id
+    @Override
     public ArrayList<Subtask> printArrayIdSubtask(int idEpic) {
         ArrayList<Integer> idSubtaskArray = epicHashMap.get(idEpic).getIdSubtaskArray();
         ArrayList<Subtask> subtaskArray = new ArrayList<>();
@@ -157,11 +177,13 @@ public class TaskManager {
 
 
     //Удаление задач по ID
+    @Override
     public void deleteTask(int id) {
         taskHashMap.remove(id);
     }
 
     //Удаление эпиков по ID
+    @Override
     public void deleteEpic(int id) {
         for (Integer idSubtask : epicHashMap.get(id).getIdSubtaskArray()) {
             subtaskHashMap.remove(idSubtask);
@@ -170,6 +192,7 @@ public class TaskManager {
     }
 
     //Удаление подзадач по ID
+    @Override
     public void deleteSubtask(int id) {
         int idEpic = subtaskHashMap.get(id).getIdEpic();
         epicHashMap.get(idEpic).deleteEpicSubtask(id);
@@ -178,23 +201,31 @@ public class TaskManager {
     }
 
     //Очистка всех задач
+    @Override
     public void clearAllTasks() {
         taskHashMap.clear();
     }
 
     //Очистка всех эпиков и подзадач с ними
+    @Override
     public void clearAllEpics() {
         epicHashMap.clear();
         subtaskHashMap.clear();
     }
 
     //Очистка всех подзадач и обновление статуса эпиков
+    @Override
     public void clearAllSubtasks() {
         subtaskHashMap.clear();
         for (Epic epic : epicHashMap.values()) {
             epic.clearSubtaskArray();
             epic.setStatus(Status.NEW);
         }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
 
