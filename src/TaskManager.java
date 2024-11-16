@@ -34,13 +34,13 @@ public interface TaskManager {
     Subtask getSubtaskById(int id);
 
     //Печать задач
-    ArrayList<Task> printAllTasks();
+    ArrayList<Task> getTasks();
 
     //Печать эпиков
-    ArrayList<Epic> printAllEpics();
+    ArrayList<Epic> getEpics();
 
     //Печать подзадач
-    ArrayList<Subtask> printAllSubtask();
+    ArrayList<Subtask> getSubtasks();
 
     //Получение списка всех подзадач определённого эпика по id
     ArrayList<Subtask> printArrayIdSubtask(int idEpic);

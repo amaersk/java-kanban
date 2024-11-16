@@ -118,49 +118,43 @@ public class InMemoryTaskManager implements TaskManager {
     //Получение задачи по id
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(taskHashMap.get(id));
-        return taskHashMap.get(id);
+        final Task task = taskHashMap.get(id);
+        historyManager.add(task);
+        return task;
     }
 
     //Получение эпик по id
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epicHashMap.get(id));
-        return epicHashMap.get(id);
+        final Epic epic = epicHashMap.get(id);
+        historyManager.add(epic);
+        return epic;
     }
 
     //Получение подзадачи по id
     @Override
     public Subtask getSubtaskById(int id) {
-        historyManager.add(subtaskHashMap.get(id));
-        return subtaskHashMap.get(id);
+        final Subtask subtask = subtaskHashMap.get(id);
+        historyManager.add(subtask);
+        return subtask;
     }
 
 
     //Печать задач
     @Override
-    public ArrayList<Task> printAllTasks() {
-        if (taskHashMap.isEmpty()) {
-            System.out.println("Задачи отсутствуют!");
-        }
+    public ArrayList<Task> getTasks() {
         return new ArrayList<>(taskHashMap.values());
     }
 
     //Печать эпиков
     @Override
-    public ArrayList<Epic> printAllEpics() {
-        if (epicHashMap.isEmpty()) {
-            System.out.println("Эпики отсутствуют!");
-        }
+    public ArrayList<Epic> getEpics() {
         return new ArrayList<>(epicHashMap.values());
     }
 
     //Печать подзадач
     @Override
-    public ArrayList<Subtask> printAllSubtask() {
-        if (subtaskHashMap.isEmpty()) {
-            System.out.println("Подзадачи отсутствуют!");
-        }
+    public ArrayList<Subtask> getSubtasks() {
         return new ArrayList<>(subtaskHashMap.values());
     }
 

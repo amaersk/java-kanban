@@ -47,9 +47,9 @@ public class Main {
         taskManager.addNewTask(task10);
 
 
-        System.out.println("Список эпиков" + taskManager.printAllEpics());
-        System.out.println("Список задач" + taskManager.printAllTasks());
-        System.out.println("Список подзадач" + taskManager.printAllSubtask());
+        System.out.println("Список эпиков" + taskManager.getEpics());
+        System.out.println("Список задач" + taskManager.getTasks());
+        System.out.println("Список подзадач" + taskManager.getSubtasks());
 
 
         System.out.println("Обновление статуса задачи");
@@ -87,16 +87,16 @@ public class Main {
 
         System.out.println("Удаление задачи 1");
         taskManager.deleteTask(1);
-        System.out.println(taskManager.printAllTasks());
+        System.out.println(taskManager.getTasks());
 
         System.out.println("Удаление эпика 1 со всем поздачами");
         taskManager.deleteEpic(3);
-        System.out.println(taskManager.printAllEpics());
-        System.out.println(taskManager.printAllSubtask());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
 
         System.out.println("Удаление всех задач");
         taskManager.clearAllTasks();
-        System.out.println(taskManager.printAllTasks());
+        System.out.println(taskManager.getTasks());
 
     }
 }
