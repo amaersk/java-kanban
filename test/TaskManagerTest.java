@@ -12,9 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TaskManagerTest {
 
 
-
-
-
     @Test
     public void shouldReturnTrueByEqualIdTask() {
         TaskManager manager = Managers.getDefault(Managers.getDefaultHistory());
@@ -56,7 +53,6 @@ class TaskManagerTest {
         checkTask.setStatus(Status.DONE);
         assertEquals(checkTask, manager.getHistory().getFirst());
     }
-
 
 
 }
