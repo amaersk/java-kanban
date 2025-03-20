@@ -25,8 +25,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void removeNode(Node node) {
         if (node != null) {
-            if (node == head) {//delete head
-                if (head.next == null) {//if only one element
+            if (node == head) { //delete head
+                if (head.next == null) { //if only one element
                     head = null;
                     tail = null;
                     node = null;
@@ -35,11 +35,11 @@ public class InMemoryHistoryManager implements HistoryManager {
                     head.prev = null;
                     node = null;
                 }
-            } else if (node == tail) {//delete tail
+            } else if (node == tail) { //delete tail
                 tail = tail.prev;
                 tail.next = null;
                 node = null;
-            } else {//delete middle node
+            } else { //delete middle node
                 node.prev.next = node.next;
                 node.next.prev = node.prev;
                 node = null;
