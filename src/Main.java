@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager = Managers.getDefault(Managers.getDefaultHistory());
 
 
         Task task1 = new Task("Задача 1", "Первая задача", Status.NEW);
@@ -68,28 +68,27 @@ public class Main {
         System.out.println("Печать списка подзадач в эпике");
         System.out.println(taskManager.printArrayIdSubtask(3));
 
-
+        System.out.println("История просмотра задач 1:");
         taskManager.getEpicById(3);
         taskManager.getSubtaskById(4);
         taskManager.getTaskById(1);
+        taskManager.getTaskById(1);
         taskManager.getTaskById(2);
         taskManager.getSubtaskById(5);
-
-        System.out.println("История просмотра задач 1:");
+        taskManager.getTaskById(1);
         System.out.println(taskManager.getHistory());
 
+        System.out.println("История просмотра задач 2:");
         for (int i = 9; i <= 15; i++) {
             taskManager.getTaskById(i);
         }
-
-        System.out.println("История просмотра задач 2:");
         System.out.println(taskManager.getHistory());
 
         System.out.println("Удаление задачи 1");
         taskManager.deleteTask(1);
         System.out.println(taskManager.getTasks());
 
-        System.out.println("Удаление эпика 1 со всем поздачами");
+        System.out.println("Удаление эпика 1 со всем подзадачами");
         taskManager.deleteEpic(3);
         System.out.println(taskManager.getEpics());
         System.out.println(taskManager.getSubtasks());
@@ -97,6 +96,7 @@ public class Main {
         System.out.println("Удаление всех задач");
         taskManager.clearAllTasks();
         System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getHistory());
 
     }
 }
