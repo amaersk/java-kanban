@@ -23,6 +23,10 @@ public class InMemoryTaskManager implements TaskManager {
         this.idCounter = 0;
     }
 
+    protected HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
     private int idCount() {
         return ++idCounter;
     }
@@ -122,22 +126,31 @@ public class InMemoryTaskManager implements TaskManager {
     //Получение задачи по id
     @Override
     public Task getTaskById(int id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        if (task != null) {
+            historyManager.add(task);
+        }
+        return task;
     }
 
     //Получение эпик по id
     @Override
     public Epic getEpicById(int id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        if (epic != null) {
+            historyManager.add(epic);
+        }
+        return epic;
     }
 
     //Получение подзадачи по id
     @Override
     public Subtask getSubtaskById(int id) {
-        historyManager.add(subTasks.get(id));
-        return subTasks.get(id);
+        Subtask subtask = subTasks.get(id);
+        if (subtask != null) {
+            historyManager.add(subtask);
+        }
+        return subtask;
     }
 
 

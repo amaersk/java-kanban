@@ -1,15 +1,94 @@
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.Status;
 import task.Subtask;
 import task.Task;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 class TaskManagerTest {
+    private TaskManager manager;
+
+    @BeforeEach
+    void setUp() {
+        manager = Managers.getDefault(Managers.getDefaultHistory());
+    }
+
+    @Test
+    void shouldAddNewTask() {
+        Task task = new Task("Test Task", "Description", Status.NEW);
+        manager.addNewTask(task);
+        
+        Task savedTask = manager.getTaskById(task.getId());
+        assertNotNull(savedTask);
+        assertEquals(task, savedTask);
+    }
+
+    @Test
+    void shouldAddNewEpic() {
+        Epic epic = new Epic("Test Epic", "Description", Status.NEW);
+        manager.addNewEpic(epic);
+        
+        Epic savedEpic = manager.getEpicById(epic.getId());
+        assertNotNull(savedEpic);
+        assertEquals(epic, savedEpic);
+    }
+
+    @Test
+    void shouldUpdateTaskStatus() {
+        Task task = new Task("Test Task", "Description", Status.NEW);
+        manager.addNewTask(task);
+        
+        task.setStatus(Status.IN_PROGRESS);
+        manager.updateTask(task);
+        
+        Task updatedTask = manager.getTaskById(task.getId());
+        assertEquals(Status.IN_PROGRESS, updatedTask.getStatus());
+    }
+
+    @Test
+    void shouldUpdateEpicStatusBasedOnSubtasks() {
+        Epic epic = new Epic("Test Epic", "Description", Status.NEW);
+        manager.addNewEpic(epic);
+        
+        Subtask subtask1 = new Subtask("Subtask 1", "Description", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask("Subtask 2", "Description", Status.NEW, epic.getId());
+        manager.addNewSubtask(subtask1);
+        manager.addNewSubtask(subtask2);
+        
+        subtask1.setStatus(Status.DONE);
+        subtask2.setStatus(Status.DONE);
+        manager.updateSubtask(subtask1);
+        manager.updateSubtask(subtask2);
+        
+        Epic updatedEpic = manager.getEpicById(epic.getId());
+        assertEquals(Status.DONE, updatedEpic.getStatus());
+    }
+
+    @Test
+    void shouldDeleteTask() {
+        Task task = new Task("Test Task", "Description", Status.NEW);
+        manager.addNewTask(task);
+        
+        manager.deleteTask(task.getId());
+        assertNull(manager.getTaskById(task.getId()));
+    }
+
+    @Test
+    void shouldDeleteEpicWithSubtasks() {
+        Epic epic = new Epic("Test Epic", "Description", Status.NEW);
+        manager.addNewEpic(epic);
+        
+        Subtask subtask = new Subtask("Test Subtask", "Description", Status.NEW, epic.getId());
+        manager.addNewSubtask(subtask);
+        
+        manager.deleteEpic(epic.getId());
+        assertNull(manager.getEpicById(epic.getId()));
+        assertNull(manager.getSubtaskById(subtask.getId()));
+    }
 
 
     @Test
@@ -53,6 +132,4 @@ class TaskManagerTest {
         checkTask.setStatus(Status.DONE);
         assertEquals(checkTask, manager.getHistory().getFirst());
     }
-
-
 }
