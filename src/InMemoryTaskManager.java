@@ -23,10 +23,6 @@ public class InMemoryTaskManager implements TaskManager {
         this.idCounter = 0;
     }
 
-    protected HistoryManager getHistoryManager() {
-        return historyManager;
-    }
-
     private int idCount() {
         return ++idCounter;
     }
