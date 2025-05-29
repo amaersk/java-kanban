@@ -15,11 +15,11 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HistoryManager historyManager;
     private int idCounter;
 
-    public InMemoryTaskManager() {
+    public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
-        this.historyManager = Managers.getDefaultHistory();
+        this.historyManager = historyManager;
         this.idCounter = 0;
     }
 
@@ -65,7 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     //Обновление статуса Epic после добавления/удаления подзадач
-    protected void updateEpicStatus(int idEpic) {
+    private void updateEpicStatus(int idEpic) {
         Epic epic = epics.get(idEpic);
         ArrayList<Integer> iDSubtaskArray = epic.getIdSubtaskArray();
         ArrayList<Subtask> subtasksArray = new ArrayList<>();
@@ -122,31 +122,22 @@ public class InMemoryTaskManager implements TaskManager {
     //Получение задачи по id
     @Override
     public Task getTaskById(int id) {
-        Task task = tasks.get(id);
-        if (task != null) {
-            historyManager.add(task);
-        }
-        return task;
+        historyManager.add(tasks.get(id));
+        return tasks.get(id);
     }
 
     //Получение эпик по id
     @Override
     public Epic getEpicById(int id) {
-        Epic epic = epics.get(id);
-        if (epic != null) {
-            historyManager.add(epic);
-        }
-        return epic;
+        historyManager.add(epics.get(id));
+        return epics.get(id);
     }
 
     //Получение подзадачи по id
     @Override
     public Subtask getSubtaskById(int id) {
-        Subtask subtask = subTasks.get(id);
-        if (subtask != null) {
-            historyManager.add(subtask);
-        }
-        return subtask;
+        historyManager.add(subTasks.get(id));
+        return subTasks.get(id);
     }
 
 
@@ -171,11 +162,7 @@ public class InMemoryTaskManager implements TaskManager {
     //Получение списка всех подзадач определённого эпика по id
     @Override
     public ArrayList<Subtask> printArrayIdSubtask(int idEpic) {
-        Epic epic = epics.get(idEpic);
-        if (epic == null) {
-            return new ArrayList<>();
-        }
-        ArrayList<Integer> idSubtaskArray = epic.getIdSubtaskArray();
+        ArrayList<Integer> idSubtaskArray = epics.get(idEpic).getIdSubtaskArray();
         ArrayList<Subtask> subtaskArray = new ArrayList<>();
         for (int id : idSubtaskArray) {
             subtaskArray.add(subTasks.get(id));

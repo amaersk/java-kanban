@@ -1,9 +1,7 @@
-import java.io.File;
-
 public final class Managers {
 
-    public static TaskManager getDefault() {
-        return new FileBackedTaskManager(new File("tasks.csv"));
+    public static TaskManager getDefault(HistoryManager historyManager) {
+        return new InMemoryTaskManager(historyManager);
     }
 
     public static HistoryManager getDefaultHistory() {
