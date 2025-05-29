@@ -1,46 +1,49 @@
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import task.Epic;
 import task.Status;
+import task.Subtask;
 import task.Task;
 
-import java.util.List;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 class HistoryManagerTest {
-    private TaskManager taskManager;
 
-    @BeforeEach
-    void setUp() {
-        taskManager = Managers.getDefault();
-    }
 
     @Test
     void shouldReturnTrueIfTaskAdded() {
-        taskManager.addNewTask(new Task("Задача 1", "Первая задача", Status.NEW));
-        taskManager.getTaskById(1);
-        final List<Task> history = taskManager.getHistory();
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        TaskManager manager = Managers.getDefault(historyManager);
+        manager.addNewTask(new Task("Задача 1", "Первая задача", Status.NEW));
+        historyManager.add(manager.getTaskById(1));
+        final List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size(), "История не пустая.");
     }
 
     @Test
     void shouldReturnTrueIfTaskDeleted() {
-        taskManager.addNewTask(new Task("Задача 1", "Первая задача", Status.NEW));
-        taskManager.getTaskById(1);
-        taskManager.deleteTask(1);
-        final List<Task> history = taskManager.getHistory();
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        TaskManager manager = Managers.getDefault(historyManager);
+        manager.addNewTask(new Task("Задача 1", "Первая задача", Status.NEW));
+        historyManager.add(manager.getTaskById(1));
+        manager.deleteTask(1);
+        final List<Task> history = historyManager.getHistory();
         assertEquals(0, history.size(), "История пустая.");
     }
 
     @Test
     void checkSizeHistoryIfTaskEquals() {
+        HistoryManager historyManager = Managers.getDefaultHistory();
         Task task = new Task("Задача", "Первая задача", Status.NEW);
-        taskManager.addNewTask(task);
         final int sizeFromRequestHistoryShouldBe = 1;
         final int sizeForCheckRequestSize = 20;
         for (int i = 0; i <= sizeForCheckRequestSize; i++) {
-            taskManager.getTaskById(task.getId());
+            historyManager.add(task);
         }
-        assertEquals(sizeFromRequestHistoryShouldBe, taskManager.getHistory().size());
+        assertEquals(sizeFromRequestHistoryShouldBe, historyManager.getHistory().size());
     }
 }

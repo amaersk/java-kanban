@@ -29,16 +29,20 @@ public class InMemoryHistoryManager implements HistoryManager {
                 if (head.next == null) { //if only one element
                     head = null;
                     tail = null;
+                    node = null;
                 } else {
                     head = head.next;
                     head.prev = null;
+                    node = null;
                 }
             } else if (node == tail) { //delete tail
                 tail = tail.prev;
                 tail.next = null;
+                node = null;
             } else { //delete middle node
                 node.prev.next = node.next;
                 node.next.prev = node.prev;
+                node = null;
             }
         }
     }
