@@ -10,27 +10,26 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File saveFile;
 
-    public FileBackedTaskManager(File saveFile, HistoryManager historyManager) {
-        super(historyManager);
+    public FileBackedTaskManager(File saveFile) {
+        super();
         this.saveFile = saveFile;
     }
 
-    // Переопределяем методы для автосохранения
 
     // Загрузка данных из файла
     public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager manager = new FileBackedTaskManager(file, Managers.getDefaultHistory());
+        FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
-        if (!file.exists()) return manager; // если файла нет — возвращаем пустой менеджер
+        if (!file.exists()) return manager;
 
         try {
             List<String> lines = Files.readAllLines(file.toPath());
-            if (lines.size() <= 1) return manager; // если файл пустой или содержит только заголовок
+            if (lines.size() <= 1) return manager;
 
-            // Читаем задачи
+            // Skip header line and process tasks
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
-                if (line.isEmpty()) break; // Пропускаем пустые строки
+                if (line.isEmpty() || line.isBlank()) continue;
 
                 Task task = fromString(line);
                 if (task != null) {
@@ -39,21 +38,25 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             manager.tasks.put(task.getId(), task);
                             break;
                         case EPIC:
-                            manager.epics.put(task.getId(), (Epic) task);
+                            Epic epic = (Epic) task;
+                            manager.epics.put(epic.getId(), epic);
                             break;
                         case SUBTASK:
-                            manager.subTasks.put(task.getId(), (Subtask) task);
+                            Subtask subtask = (Subtask) task;
+                            manager.subTasks.put(subtask.getId(), subtask);
+                            // Add the subtask to its epic right away
+                            Epic parentEpic = manager.epics.get(subtask.getIdEpic());
+                            if (parentEpic != null) {
+                                parentEpic.addIdSubtask(subtask.getId());
+                            }
                             break;
                     }
                 }
             }
 
-            // Восстанавливаем связи эпиков и подзадач
-            for (Subtask subtask : manager.subTasks.values()) {
-                Epic epic = manager.epics.get(subtask.getIdEpic());
-                if (epic != null) {
-                    epic.addIdSubtask(subtask.getId());
-                }
+            // Update epic statuses after all subtasks are loaded
+            for (Epic epic : manager.epics.values()) {
+                manager.updateEpicStatus(epic.getId());
             }
 
         } catch (IOException e) {
@@ -66,31 +69,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     // Парсинг строки в объект Task / Epic / Subtask
     private static Task fromString(String value) {
         String[] parts = value.split(",");
-        int id = Integer.parseInt(parts[0]);
-        Type type = Type.valueOf(parts[1]);
-        String name = parts[2];
-        Status status = Status.valueOf(parts[3]);
-        String description = parts[4];
+        if (parts.length < 5) return null;  // Minimum required fields
 
-        switch (type) {
-            case TASK:
-                Task task = new Task(name, description, status);
-                task.setId(id);
-                task.setStatus(status);
-                return task;
-            case EPIC:
-                Epic epic = new Epic(name, description, status);
-                epic.setId(id);
-                epic.setStatus(status);
-                return epic;
-            case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
-                Subtask subtask = new Subtask(name, description, status, epicId);
-                subtask.setId(id);
-                subtask.setStatus(status);
-                return subtask;
-            default:
-                return null;
+        try {
+            int id = Integer.parseInt(parts[0]);
+            Type type = Type.valueOf(parts[1]);
+            String name = parts[2];
+            Status status = Status.valueOf(parts[3]);
+            String description = parts[4];
+
+            switch (type) {
+                case TASK:
+                    Task task = new Task(name, description, status);
+                    task.setId(id);
+                    return task;
+                case EPIC:
+                    Epic epic = new Epic(name, description, status);
+                    epic.setId(id);
+                    return epic;
+                case SUBTASK:
+                    if (parts.length < 6) return null;  // Subtask requires epic ID
+                    int epicId = Integer.parseInt(parts[5]);
+                    Subtask subtask = new Subtask(name, description, status, epicId);
+                    subtask.setId(id);
+                    return subtask;
+                default:
+                    return null;
+            }
+        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+            return null;  // Return null if parsing fails
         }
     }
 
@@ -169,19 +176,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     // Сохранение текущего состояния в файл
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile))) {
-            writer.write("id,type,name,status,description,epic");
-            writer.newLine();
+            // Write header
+            writer.write("id,type,name,status,description,epic\n");
 
+            // Write tasks
             for (Task task : getTasks()) {
                 writer.write(toString(task));
                 writer.newLine();
             }
 
+            // Write epics
             for (Epic epic : getEpics()) {
                 writer.write(toString(epic));
                 writer.newLine();
             }
 
+            // Write subtasks
             for (Subtask subtask : getSubtasks()) {
                 writer.write(toString(subtask));
                 writer.newLine();
@@ -194,35 +204,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     // Преобразование задачи в строку формата CSV
     private String toString(Task task) {
-        return String.join(",",
-                String.valueOf(task.getId()),
-                Type.TASK.toString(),
-                task.getName(),
-                task.getStatus().toString(),
-                task.getDescription(),
-                ""
-        );
-    }
+        StringBuilder builder = new StringBuilder();
+        builder.append(task.getId()).append(",");
+        builder.append(task.getType()).append(",");
+        builder.append(task.getName()).append(",");
+        builder.append(task.getStatus()).append(",");
+        builder.append(task.getDescription());
 
-    private String toString(Epic epic) {
-        return String.join(",",
-                String.valueOf(epic.getId()),
-                Type.EPIC.toString(),
-                epic.getName(),
-                epic.getStatus().toString(),
-                epic.getDescription(),
-                ""
-        );
-    }
+        if (task.getType() == Type.SUBTASK) {
+            builder.append(",").append(((Subtask) task).getIdEpic());
+        }
 
-    private String toString(Subtask subtask) {
-        return String.join(",",
-                String.valueOf(subtask.getId()),
-                Type.SUBTASK.toString(),
-                subtask.getName(),
-                subtask.getStatus().toString(),
-                subtask.getDescription(),
-                String.valueOf(subtask.getIdEpic())
-        );
+        return builder.toString();
     }
 }

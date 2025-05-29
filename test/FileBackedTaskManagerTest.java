@@ -15,13 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileBackedTaskManagerTest {
     private FileBackedTaskManager taskManager;
     private File tempFile;
-    private HistoryManager historyManager;
 
     @BeforeEach
     void setUp() throws IOException {
         tempFile = File.createTempFile("tasks", ".csv");
-        historyManager = Managers.getDefaultHistory();
-        taskManager = new FileBackedTaskManager(tempFile, historyManager);
+        taskManager = new FileBackedTaskManager(tempFile);
     }
 
     @AfterEach

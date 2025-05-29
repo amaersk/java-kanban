@@ -12,7 +12,7 @@ class TaskManagerTest {
 
     @BeforeEach
     void setUp() {
-        manager = Managers.getDefault(Managers.getDefaultHistory());
+        manager = Managers.getDefault();
     }
 
     @Test
@@ -79,10 +79,8 @@ class TaskManagerTest {
     void shouldDeleteEpicWithSubtasks() {
         Epic epic = new Epic("Test Epic", "Description", Status.NEW);
         manager.addNewEpic(epic);
-
         Subtask subtask = new Subtask("Test Subtask", "Description", Status.NEW, epic.getId());
         manager.addNewSubtask(subtask);
-
         manager.deleteEpic(epic.getId());
         assertNull(manager.getEpicById(epic.getId()));
         assertNull(manager.getSubtaskById(subtask.getId()));
@@ -91,7 +89,7 @@ class TaskManagerTest {
 
     @Test
     public void shouldReturnTrueByEqualIdTask() {
-        TaskManager manager = Managers.getDefault(Managers.getDefaultHistory());
+        TaskManager manager = Managers.getDefault();
         manager.addNewTask(new Task("Задача 1", "Первая задача", Status.NEW));
         Task task1 = manager.getTaskById(1);
         Task task2 = manager.getTaskById(1);
@@ -100,7 +98,7 @@ class TaskManagerTest {
 
     @Test
     public void shouldReturnTrueByEqualIdEpic() {
-        TaskManager manager = Managers.getDefault(Managers.getDefaultHistory());
+        TaskManager manager = Managers.getDefault();
         manager.addNewEpic(new Epic("Эпик 1", "Первый эпик", Status.NEW));
         Epic epic1 = manager.getEpicById(1);
         Epic epic2 = manager.getEpicById(1);
@@ -109,7 +107,7 @@ class TaskManagerTest {
 
     @Test
     public void shouldReturnTrueByEqualIdSubtask() {
-        TaskManager manager = Managers.getDefault(Managers.getDefaultHistory());
+        TaskManager manager = Managers.getDefault();
         manager.addNewEpic(new Epic("Эпик", "", Status.NEW));
         manager.addNewSubtask(new Subtask("Подзадача", "", Status.NEW, 1));
         Subtask subtask1 = manager.getSubtaskById(2);
@@ -119,7 +117,7 @@ class TaskManagerTest {
 
     @Test
     void checkHistoryManagerSavesTaskVersions() {
-        TaskManager manager = Managers.getDefault(Managers.getDefaultHistory());
+        TaskManager manager = Managers.getDefault();
         Task checkTask = new Task("Задача 1", "Первая задача", Status.NEW);
         manager.addNewTask(checkTask);
         manager.getTaskById(checkTask.getId());

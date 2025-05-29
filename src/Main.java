@@ -11,8 +11,7 @@ public class Main {
     public static void main(String[] args) {
 
         File file = new File("tasks.csv");
-        HistoryManager historyManager = Managers.getDefaultHistory();
-        TaskManager manager = new FileBackedTaskManager(file, historyManager);
+        TaskManager manager = new FileBackedTaskManager(file);
 
         // Добавляем задачи
         Task task1 = new Task("Задача 1", "Описание 1", Status.NEW);
