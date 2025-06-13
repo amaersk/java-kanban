@@ -1,7 +1,7 @@
 package task;
 
 public enum Status {
-    NEW,
-    IN_PROGRESS,
-    DONE
+    NEW,       // Новая
+    IN_PROGRESS, // В процессе
+    DONE       // Завершена
 }
