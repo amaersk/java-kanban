@@ -5,7 +5,6 @@ import task.Task;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -81,15 +80,11 @@ public class InMemoryTaskManager implements TaskManager {
             epics.get(idEpic).setStatus(Status.NEW);
         } else {
             for (Subtask subtask : subtasksArray) {
-                if (subtask.getStatus().equals(Status.DONE))
-                    isSubTaskDone = true;
-                if (subtask.getStatus().equals(Status.NEW))
-                    isSubTaskNew = true;
+                if (subtask.getStatus().equals(Status.DONE)) isSubTaskDone = true;
+                if (subtask.getStatus().equals(Status.NEW)) isSubTaskNew = true;
             }
-            if (isSubTaskDone && !isSubTaskNew)
-                epics.get(idEpic).setStatus(Status.DONE);
-            else if (isSubTaskNew && !isSubTaskDone)
-                epics.get(idEpic).setStatus(Status.NEW);
+            if (isSubTaskDone && !isSubTaskNew) epics.get(idEpic).setStatus(Status.DONE);
+            else if (isSubTaskNew && !isSubTaskDone) epics.get(idEpic).setStatus(Status.NEW);
             else epics.get(idEpic).setStatus(Status.IN_PROGRESS);
 
         }
@@ -297,8 +292,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public boolean isTasksIntersect(Task task1, Task task2) {
-        if (task1.getStartTime() == null || task2.getStartTime() == null ||
-            task1.getDuration() == null || task2.getDuration() == null) {
+        if (task1.getStartTime() == null || task2.getStartTime() == null || task1.getDuration() == null || task2.getDuration() == null) {
             return false;
         }
 
@@ -312,11 +306,7 @@ public class InMemoryTaskManager implements TaskManager {
         // 2. Другая задача начинается до того, как заканчивается первая И
         // 3. Они не начинаются в одно и то же время И
         // 4. Одна задача не начинается точно в момент окончания другой
-        return !task1End.isBefore(task2Start) && 
-               !task2End.isBefore(task1Start) && 
-               !task1Start.equals(task2Start) &&
-               !task1End.equals(task2Start) &&
-               !task2End.equals(task1Start);
+        return !task1End.isBefore(task2Start) && !task2End.isBefore(task1Start) && !task1Start.equals(task2Start) && !task1End.equals(task2Start) && !task2End.equals(task1Start);
     }
 
     @Override
@@ -372,17 +362,9 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        LocalDateTime startTime = subtasks.stream()
-                .map(Subtask::getStartTime)
-                .filter(Objects::nonNull)
-                .min(LocalDateTime::compareTo)
-                .orElse(null);
+        LocalDateTime startTime = subtasks.stream().map(Subtask::getStartTime).filter(Objects::nonNull).min(LocalDateTime::compareTo).orElse(null);
 
-        LocalDateTime endTime = subtasks.stream()
-                .map(Subtask::getEndTime)
-                .filter(Objects::nonNull)
-                .max(LocalDateTime::compareTo)
-                .orElse(null);
+        LocalDateTime endTime = subtasks.stream().map(Subtask::getEndTime).filter(Objects::nonNull).max(LocalDateTime::compareTo).orElse(null);
 
         epic.setEndTime(endTime);
     }

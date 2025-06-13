@@ -69,8 +69,7 @@ public class Epic extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return Objects.equals(idSubtaskArray, epic.idSubtaskArray) &&
-                Objects.equals(endTime, epic.endTime);
+        return Objects.equals(idSubtaskArray, epic.idSubtaskArray) && Objects.equals(endTime, epic.endTime);
     }
 
     @Override

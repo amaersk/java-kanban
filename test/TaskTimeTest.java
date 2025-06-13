@@ -116,10 +116,7 @@ class TaskTimeTest {
         Set<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
         System.out.println("\nРазмер списка приоритетных задач: " + prioritizedTasks.size());
         for (Task task : prioritizedTasks) {
-            System.out.println("Задача: " + task.getName() +
-                    ", Время начала: " + task.getStartTime() +
-                    ", ID: " + task.getId() +
-                    ", Тип: " + task.getType());
+            System.out.println("Задача: " + task.getName() + ", Время начала: " + task.getStartTime() + ", ID: " + task.getId() + ", Тип: " + task.getType());
         }
 
         // Преобразуем Set в List для удобства проверки
