@@ -66,12 +66,9 @@ class TaskTimeTest {
 
     @Test
     void testPrioritizedTasks() {
-        System.out.println("\nДобавление задач в менеджер:");
-
         // Создаем эпик
         Epic epic = new Epic("Epic 1", "Description of Epic 1", Status.NEW);
         taskManager.addNewEpic(epic);
-        System.out.println("\nДобавлен эпик: " + epic.getName() + " с ID: " + epic.getId());
 
         // Создаем задачи с разным временем начала
         Task task1 = new Task("Task 1", "Description of Task 1", Status.NEW);
@@ -95,36 +92,15 @@ class TaskTimeTest {
         subtask2.setDuration(Duration.ofMinutes(30));
         taskManager.addNewSubtask(subtask2);
 
-        // Проверяем содержимое менеджера
-        System.out.println("\nЗадачи в менеджере:");
-        System.out.println("Количество задач: " + taskManager.getTasks().size());
-        for (Task task : taskManager.getTasks()) {
-            System.out.println("Задача: " + task.getName() + ", ID: " + task.getId());
-        }
-
-        System.out.println("\nКоличество подзадач: " + taskManager.getSubtasks().size());
-        for (Subtask subtask : taskManager.getSubtasks()) {
-            System.out.println("Подзадача: " + subtask.getName() + ", ID: " + subtask.getId());
-        }
-
-        System.out.println("\nКоличество эпиков: " + taskManager.getEpics().size());
-        for (Epic epicTask : taskManager.getEpics()) {
-            System.out.println("Эпик: " + epicTask.getName() + ", ID: " + epicTask.getId());
-        }
-
         // Получаем приоритетные задачи
         Set<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
-        System.out.println("\nРазмер списка приоритетных задач: " + prioritizedTasks.size());
-        for (Task task : prioritizedTasks) {
-            System.out.println("Задача: " + task.getName() + ", Время начала: " + task.getStartTime() + ", ID: " + task.getId() + ", Тип: " + task.getType());
-        }
 
         // Преобразуем Set в List для удобства проверки
         List<Task> taskList = new ArrayList<>(prioritizedTasks);
-
+        
         // Проверяем, что все задачи добавлены и отсортированы по времени начала
         assertEquals(4, taskList.size(), "Должно быть 4 задачи в списке");
-
+        
         // Проверяем порядок задач
         assertEquals(subtask1, taskList.get(0), "Первой должна быть Подзадача 1");
         assertEquals(task1, taskList.get(1), "Второй должна быть Задача 1");
