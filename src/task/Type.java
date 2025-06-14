@@ -1,7 +1,7 @@
 package task;
 
 public enum Type {
-    TASK,
-    EPIC,
-    SUBTASK
+    TASK,    // Задача
+    EPIC,    // Эпик
+    SUBTASK  // Подзадача
 }

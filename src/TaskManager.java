@@ -4,6 +4,7 @@ import task.Task;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     //Создание задачи
@@ -65,4 +66,13 @@ public interface TaskManager {
 
     //Получение истории просмотра всех задач
     List<Task> getHistory();
+
+    //Получение списка задач, отсортированных по приоритету (startTime)
+    Set<Task> getPrioritizedTasks();
+
+    //Проверка пересечения двух задач по времени
+    boolean isTasksIntersect(Task task1, Task task2);
+
+    //Проверка пересечения задачи с любой другой задачей в менеджере
+    boolean isTaskIntersectWithAny(Task task);
 }

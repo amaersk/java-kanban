@@ -5,16 +5,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private final File saveFile;
 
     public FileBackedTaskManager(File saveFile) {
         super();
         this.saveFile = saveFile;
     }
-
 
     // Загрузка данных из файла
     public static FileBackedTaskManager loadFromFile(File file) {
@@ -26,7 +29,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             List<String> lines = Files.readAllLines(file.toPath());
             if (lines.size() <= 1) return manager;
 
-            // Skip header line and process tasks
+            // Пропускаем заголовок и обрабатываем задачи
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 if (line.isEmpty() || line.isBlank()) continue;
@@ -44,7 +47,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         case SUBTASK:
                             Subtask subtask = (Subtask) task;
                             manager.subTasks.put(subtask.getId(), subtask);
-                            // Add the subtask to its epic right away
+                            // Добавляем подзадачу в эпик сразу
                             Epic parentEpic = manager.epics.get(subtask.getIdEpic());
                             if (parentEpic != null) {
                                 parentEpic.addIdSubtask(subtask.getId());
@@ -54,7 +57,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
 
-            // Update epic statuses after all subtasks are loaded
+            // Обновляем статус эпика после добавления всех подзадач
             for (Epic epic : manager.epics.values()) {
                 manager.updateEpicStatus(epic.getId());
             }
@@ -66,10 +69,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return manager;
     }
 
-    // Парсинг строки в объект Task / Epic / Subtask
+    // Преобразование строки в объект Task / Epic / Subtask
     private static Task fromString(String value) {
         String[] parts = value.split(",");
-        if (parts.length < 5) return null;  // Minimum required fields
+        if (parts.length < 5) return null;  // Минимум требуемых полей
 
         try {
             int id = Integer.parseInt(parts[0]);
@@ -78,26 +81,38 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Status status = Status.valueOf(parts[3]);
             String description = parts[4];
 
+            Task task = null;
             switch (type) {
                 case TASK:
-                    Task task = new Task(name, description, status);
-                    task.setId(id);
-                    return task;
+                    task = new Task(name, description, status);
+                    break;
                 case EPIC:
-                    Epic epic = new Epic(name, description, status);
-                    epic.setId(id);
-                    return epic;
+                    task = new Epic(name, description, status);
+                    break;
                 case SUBTASK:
-                    if (parts.length < 6) return null;  // Subtask requires epic ID
+                    if (parts.length < 6) return null;  // Подзадача требует ID эпика
                     int epicId = Integer.parseInt(parts[5]);
-                    Subtask subtask = new Subtask(name, description, status, epicId);
-                    subtask.setId(id);
-                    return subtask;
-                default:
-                    return null;
+                    task = new Subtask(name, description, status, epicId);
+                    break;
             }
+
+            if (task != null) {
+                task.setId(id);
+
+                // Парсим продолжительность, если она есть
+                if (parts.length > 6 && !parts[6].equals("null")) {
+                    task.setDuration(Duration.ofMinutes(Long.parseLong(parts[6])));
+                }
+
+                // Парсим время начала, если оно есть
+                if (parts.length > 7 && !parts[7].equals("null")) {
+                    task.setStartTime(LocalDateTime.parse(parts[7], formatter));
+                }
+            }
+
+            return task;
         } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-            return null;  // Return null if parsing fails
+            return null;  // Возвращаем null, если парсинг не удался
         }
     }
 
@@ -176,22 +191,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     // Сохранение текущего состояния в файл
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile))) {
-            // Write header
-            writer.write("id,type,name,status,description,epic\n");
+            // Записываем заголовок
+            writer.write("id,type,name,status,description,epic,duration,startTime\n");
 
-            // Write tasks
+            // Записываем задачи
             for (Task task : getTasks()) {
                 writer.write(toString(task));
                 writer.newLine();
             }
 
-            // Write epics
+            // Записываем эпики
             for (Epic epic : getEpics()) {
                 writer.write(toString(epic));
                 writer.newLine();
             }
 
-            // Write subtasks
+            // Записываем подзадачи
             for (Subtask subtask : getSubtasks()) {
                 writer.write(toString(subtask));
                 writer.newLine();
@@ -214,6 +229,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         if (task.getType() == Type.SUBTASK) {
             builder.append(",").append(((Subtask) task).getIdEpic());
         }
+
+        // Добавляем продолжительность
+        builder.append(",").append(task.getDuration() != null ? task.getDuration().toMinutes() : "null");
+
+        // Добавляем время начала
+        builder.append(",").append(task.getStartTime() != null ? task.getStartTime().format(formatter) : "null");
 
         return builder.toString();
     }
