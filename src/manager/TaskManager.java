@@ -77,4 +77,4 @@ public interface TaskManager {
 
     //Проверка пересечения задачи с любой другой задачей в менеджере
     boolean isTaskIntersectWithAny(Task task);
-} 
+}
