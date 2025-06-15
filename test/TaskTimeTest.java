@@ -141,4 +141,4 @@ class TaskTimeTest {
         // Обновление должно быть разрешено, так как это та же самая задача
         assertEquals(LocalDateTime.of(2024, 1, 1, 10, 30), task1.getStartTime());
     }
-} 
+}

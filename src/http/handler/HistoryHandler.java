@@ -38,4 +38,4 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
             sendInternalServerError(exchange);
         }
     }
-} 
+}

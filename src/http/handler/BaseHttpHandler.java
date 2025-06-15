@@ -37,4 +37,4 @@ public abstract class BaseHttpHandler {
         h.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, 0);
         h.close();
     }
-} 
+}

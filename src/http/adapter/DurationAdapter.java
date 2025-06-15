@@ -22,4 +22,4 @@ public class DurationAdapter extends TypeAdapter<Duration> {
         long minutes = jsonReader.nextLong();
         return Duration.ofMinutes(minutes);
     }
-} 
+}

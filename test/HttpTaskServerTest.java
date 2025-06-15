@@ -260,4 +260,4 @@ public class HttpTaskServerTest {
         assertEquals(200, response.statusCode());
         assertTrue(response.body().contains("Test Task"));
     }
-} 
+}
