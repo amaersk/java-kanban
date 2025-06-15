@@ -97,10 +97,10 @@ class TaskTimeTest {
 
         // Преобразуем Set в List для удобства проверки
         List<Task> taskList = new ArrayList<>(prioritizedTasks);
-        
+
         // Проверяем, что все задачи добавлены и отсортированы по времени начала
         assertEquals(4, taskList.size(), "Должно быть 4 задачи в списке");
-        
+
         // Проверяем порядок задач
         assertEquals(subtask1, taskList.get(0), "Первой должна быть Подзадача 1");
         assertEquals(task1, taskList.get(1), "Второй должна быть Задача 1");
@@ -141,4 +141,4 @@ class TaskTimeTest {
         // Обновление должно быть разрешено, так как это та же самая задача
         assertEquals(LocalDateTime.of(2024, 1, 1, 10, 30), task1.getStartTime());
     }
-} 
+}

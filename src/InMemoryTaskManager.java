@@ -1,3 +1,4 @@
+import manager.TaskManager;
 import task.Epic;
 import task.Status;
 import task.Subtask;
@@ -142,8 +143,9 @@ public class InMemoryTaskManager implements TaskManager {
         Task task = tasks.get(id);
         if (task != null) {
             historyManager.add(task);
+            return task;
         }
-        return task;
+        return null; // Оставляем null для обратной совместимости, исключение будет в обработчиках
     }
 
     //Получение эпик по id
@@ -152,8 +154,9 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         if (epic != null) {
             historyManager.add(epic);
+            return epic;
         }
-        return epic;
+        return null; // Оставляем null для обратной совместимости, исключение будет в обработчиках
     }
 
     //Получение подзадачи по id
@@ -162,8 +165,9 @@ public class InMemoryTaskManager implements TaskManager {
         Subtask subtask = subTasks.get(id);
         if (subtask != null) {
             historyManager.add(subtask);
+            return subtask;
         }
-        return subtask;
+        return null; // Оставляем null для обратной совместимости, исключение будет в обработчиках
     }
 
     //Печать задач
