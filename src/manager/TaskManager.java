@@ -1,3 +1,5 @@
+package manager;
+
 import task.Epic;
 import task.Subtask;
 import task.Task;
@@ -75,4 +77,4 @@ public interface TaskManager {
 
     //Проверка пересечения задачи с любой другой задачей в менеджере
     boolean isTaskIntersectWithAny(Task task);
-}
+} 
